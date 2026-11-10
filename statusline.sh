@@ -126,7 +126,9 @@ if [ -n "$branch" ]; then
     else
         GIT_TEXT="${CYAN}${branch}${RESET}"
     fi
-    stats=$(git diff HEAD --shortstat 2>/dev/null)
+    # Read-only diff: without these two options git may rewrite .git/index
+    # here, and a commit running at the same moment fails on index.lock.
+    stats=$(git --no-optional-locks -c diff.autoRefreshIndex=false diff HEAD --shortstat 2>/dev/null)
     re_add='([0-9]+) insertion'; re_del='([0-9]+) deletion'
     added=0; removed=0
     [[ $stats =~ $re_add ]] && added=${BASH_REMATCH[1]}
